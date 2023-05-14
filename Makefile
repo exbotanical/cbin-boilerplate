@@ -1,21 +1,27 @@
-CC=gcc
-CFLAGS=-Wall -Wextra -pedantic -std=c17
-LDFLAGS=
-OBJFILES=$(wildcard src/*.c)
-TARGET=<project>
+CC ?= gcc
+LINTER ?= clang-format
 
-DEST=/usr/local/bin
+SRCDIR := src
+DEPSDIR := deps
+TESTDIR := t
 
-all: $(TARGET)
+TARGET := <project>
+TEST_TARGET := test
 
-$(TARGET): $(OBJFILES)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJFILES) $(LDFLAGS)
+SRC := $(wildcard $(SRCDIR)/*.c)
+TEST_DEPS := $(wildcard $(DEPSDIR)/tap.c/*.c)
+DEPS := $(filter-out $(wildcard $(DEPSDIR)/tap.c/*), $(wildcard $(DEPSDIR)/*/*.c))
 
-debug: CFLAGS += -D debug
-debug: $(TARGET)
+CFLAGS := -Wall -Wextra -pedantic -std=c17
+LIBS :=
+
+$(TARGET):
+	$(CC) $(CFLAGS) $(SRC) $(DEPS) $(LIBS) -o $(TARGET)
 
 clean:
-	rm $(TARGET)
+	rm -f $(OBJ) $(STATIC_TARGET) $(DYNAMIC_TARGET) $(EXAMPLE_TARGET) $(TEST_TARGET)
 
-install: $(TARGET)
-	install -m 0777 $(TARGET) $(DEST)/$(TARGET)
+lint:
+	$(LINTER) -i $(wildcard $(SRCDIR)/*) $(wildcard $(TESTDIR)/*)
+
+.PHONY: clean lint

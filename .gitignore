@@ -1,1 +1,7 @@
 <project>
+*.a
+*.o
+*.so
+.vscode
+example
+obj

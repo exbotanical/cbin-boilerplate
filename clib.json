@@ -1,0 +1,14 @@
+{
+  "name": "<project>",
+  "version": "0.0.1",
+  "author": "Matthew Zito",
+  "repo": "exbotanical/<project>",
+  "license": "MIT",
+  "description": "",
+  "keywords": [],
+  "install": "echo TODO",
+  "uninstall": "echo TODO",
+  "development": {
+    "thlorenz/tap.c": "*"
+  }
+}

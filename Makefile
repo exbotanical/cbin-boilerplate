@@ -10,8 +10,8 @@ DEPSDIR := deps
 TESTDIR := t
 
 SRC := $(wildcard $(SRCDIR)/*.c)
-TEST_DEPS := $(wildcard $(DEPSDIR)/tap.c/*.c)
-DEPS := $(filter-out $(wildcard $(DEPSDIR)/tap.c/*), $(wildcard $(DEPSDIR)/*/*.c))
+TEST_DEPS := $(wildcard $(DEPSDIR)/libtap/*.c)
+DEPS := $(filter-out $(wildcard $(DEPSDIR)/libtap/*), $(wildcard $(DEPSDIR)/*/*.c))
 
 CFLAGS := -I$(DEPSDIR) -Wall -Wextra -pedantic
 LIBS :=

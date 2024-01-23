@@ -9,6 +9,6 @@
   "install": "echo TODO",
   "uninstall": "echo TODO",
   "development": {
-    "thlorenz/tap.c": "*"
+    "exbotanical/libtap": "*"
   }
 }

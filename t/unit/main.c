@@ -3,8 +3,7 @@
 
 // Externs initialized in m
 int
-main (int argc, char** argv)
-{
+main (int argc, char** argv) {
   plan(0);
 
   done_testing();

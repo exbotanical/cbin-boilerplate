@@ -23,6 +23,7 @@ $(PROG):
 
 test:
 	$(MAKE) unit_test
+	$(MAKE) integ_test
 
 unit_test:
 	$(CC) $(wildcard $(TESTDIR)/unit/*.c) $(TEST_DEPS) $(DEPS) $(filter-out $(SRCDIR)/main.c, $(SRC)) -I$(SRCDIR) -I$(DEPSDIR) $(LIBS) -o $(UNIT_TARGET)

@@ -1,43 +1,43 @@
-CC ?= gcc
-AR ?= ar
-LINTER ?= clang-format
+include Makefile.config
 
-PROG := <project>
+.PHONY: all test unit_test integ_test clean lint
+.DELETE_ON_ERROR:
+
 UNIT_TARGET := unit_test
+TARGET      := $(PROGNAME).$(PROGVERS)
 
-SRCDIR := src
-DEPSDIR := deps
-TESTDIR := t
+SRCDIR      := src
+DEPSDIR     := deps
+TESTDIR     := t
 
-SRC := $(wildcard $(SRCDIR)/*.c)
-TEST_DEPS := $(wildcard $(DEPSDIR)/libtap/*.c)
-DEPS := $(filter-out $(wildcard $(DEPSDIR)/libtap/*), $(wildcard $(DEPSDIR)/*/*.c))
+SRC         := $(wildcard $(SRCDIR)/*.c)
+TESTS       := $(wildcard $(TESTDIR)/*.c)
+UNIT_TESTS  := $(wildcard $(TESTDIR)/unit/*.c)
+TEST_DEPS   := $(wildcard $(DEPSDIR)/tap.c/*.c)
+DEPS        := $(filter-out $(wildcard $(DEPSDIR)/tap.c/*), $(wildcard $(DEPSDIR)/*/*.c))
 
-CFLAGS := -I$(DEPSDIR) -Wall -Wextra -pedantic
-LIBS :=
+CFLAGS      := -I$(DEPSDIR) -I$(SRCDIR) -Wall -Wextra -pedantic
 
-TESTS := $(wildcard $(TESTDIR)/*.c)
+$(TARGET):
+	$(CC) $(CFLAGS) $(SRC) $(DEPS) -o $(TARGET)
 
-$(PROG):
-	$(CC) $(CFLAGS) $(SRC) $(DEPS) $(LIBS) -Ideps -Isrc -o $(PROG)
+all: $(TARGET)
 
 test:
 	$(MAKE) unit_test
 	$(MAKE) integ_test
 
 unit_test:
-	$(CC) $(wildcard $(TESTDIR)/unit/*.c) $(TEST_DEPS) $(DEPS) $(filter-out $(SRCDIR)/main.c, $(SRC)) -I$(SRCDIR) -I$(DEPSDIR) $(LIBS) -o $(UNIT_TARGET)
+	$(CC) $(CFLAGS) $(UNIT_TESTS) $(TEST_DEPS) $(DEPS) $(filter-out $(SRCDIR)/main.c, $(SRC)) -o $(UNIT_TARGET)
 	./$(UNIT_TARGET)
 	$(MAKE) clean
 
-integ_test: $(PROG)
+integ_test: $(TARGET)
 	./$(TESTDIR)/integ/utils/run.bash
 	$(MAKE) clean
 
 clean:
-	rm -f $(UNIT_TARGET) $(PROG)
+	rm -f $(UNIT_TARGET) $(TARGET)
 
 lint:
-	$(LINTER) -i $(SRC) $(wildcard $(TESTDIR)/*/*.c)
-
-.PHONY: test unit_test integ_test clean lint
+	$(LINTER) -i $(SRC) $(TESTS)

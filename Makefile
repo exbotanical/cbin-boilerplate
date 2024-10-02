@@ -1,6 +1,6 @@
 include Makefile.config
 
-.PHONY: all test unit_test integ_test clean lint
+.PHONY: all test unit_test integ_test clean fmt
 .DELETE_ON_ERROR:
 
 UNIT_TARGET := unit_test
@@ -11,33 +11,34 @@ DEPSDIR     := deps
 TESTDIR     := t
 
 SRC         := $(wildcard $(SRCDIR)/*.c)
+SRC_NOMAIN  := $(filter-out $(SRCDIR)/main.c, $(SRC))
 TESTS       := $(wildcard $(TESTDIR)/*.c)
 UNIT_TESTS  := $(wildcard $(TESTDIR)/unit/*.c)
 TEST_DEPS   := $(wildcard $(DEPSDIR)/tap.c/*.c)
 DEPS        := $(filter-out $(wildcard $(DEPSDIR)/tap.c/*), $(wildcard $(DEPSDIR)/*/*.c))
 
-CFLAGS      := -I$(DEPSDIR) -I$(SRCDIR) -Wall -Wextra -pedantic
+INCLUDES    := -I$(DEPSDIR) -I$(SRCDIR)
+LIBS        :=
+CFLAGS      := -Wall -Wextra -pedantic $(INCLUDES) $(LIBS)
 
-$(TARGET):
-	$(CC) $(CFLAGS) $(SRC) $(DEPS) -o $(TARGET)
-
-all: $(TARGET)
+all: $(SRC) $(DEPS)
+	$(CC) $(CFLAGS) $^ -o $@
 
 test:
-	$(MAKE) unit_test
-	$(MAKE) integ_test
+	@$(MAKE) unit_test
+	@$(MAKE) integ_test
 
-unit_test:
-	$(CC) $(CFLAGS) $(UNIT_TESTS) $(TEST_DEPS) $(DEPS) $(filter-out $(SRCDIR)/main.c, $(SRC)) -o $(UNIT_TARGET)
-	./$(UNIT_TARGET)
-	$(MAKE) clean
+unit_test: $(UNIT_TESTS) $(TEST_DEPS) $(DEPS) $(SRC_NOMAIN)
+	$(CC) $(CFLAGS) $^ -o $(UNIT_TARGET)
+	@./$(UNIT_TARGET)
+	@$(MAKE) clean
 
-integ_test: $(TARGET)
-	./$(TESTDIR)/integ/utils/run.bash
-	$(MAKE) clean
+integ_test: all
+	@./$(TESTDIR)/integ/utils/run.bash
+	@$(MAKE) clean
 
 clean:
-	rm -f $(UNIT_TARGET) $(TARGET)
+	@rm -f $(UNIT_TARGET) $(TARGET)
 
-lint:
-	$(LINTER) -i $(SRC) $(TESTS)
+fmt:
+	@$(FMT) -i $(SRC) $(TESTS)

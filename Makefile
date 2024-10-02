@@ -19,17 +19,17 @@ DEPS        := $(filter-out $(wildcard $(DEPSDIR)/tap.c/*), $(wildcard $(DEPSDIR
 
 INCLUDES    := -I$(DEPSDIR) -I$(SRCDIR)
 LIBS        :=
-CFLAGS      := -Wall -Wextra -pedantic $(INCLUDES) $(LIBS)
+CFLAGS      := -Wall -Wextra -pedantic $(INCLUDES)
 
 all: $(SRC) $(DEPS)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 test:
 	@$(MAKE) unit_test
 	@$(MAKE) integ_test
 
 unit_test: $(UNIT_TESTS) $(TEST_DEPS) $(DEPS) $(SRC_NOMAIN)
-	$(CC) $(CFLAGS) $^ -o $(UNIT_TARGET)
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $(UNIT_TARGET)
 	@./$(UNIT_TARGET)
 	@$(MAKE) clean
 
